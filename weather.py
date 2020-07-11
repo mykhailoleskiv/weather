@@ -73,21 +73,23 @@ class Weather:
                 }
                 i += 1
 
-    def pretty_print(self, weather_type="current"):
+    def pretty_output(self, weather_type="current"):
+        res = ''
         if weather_type == "current":
             for key, value in self.current.items():
-                print(f"{key} - {value}")
+                res += f"{key} - {value}\n"
         elif weather_type == "forecast":
             for key, value in self.forecast.items():
-                print(f"{key}:")
+                res += f"{key}:\n"
                 for k1, v1 in value.items():
-                    print(f"\t{k1}:")
+                    res += f"\t{k1}:\n"
                     for k2, v2 in v1.items():
-                        print(f"\t\t{k2} - {v2}")
+                        res += f"\t\t{k2} - {v2}\n"
+        return res
 
 
 if __name__ == "__main__":
-    weather = Weather(input("Введіть локацію: "))
-    # weather = Weather('львів')
-    weather.pretty_print(weather_type="current")
-    weather.pretty_print(weather_type="forecast")
+    # weather = Weather(input("Введіть локацію: "))
+    weather = Weather('львів')
+    print(weather.pretty_output(weather_type="current"))
+    print(weather.pretty_output(weather_type="forecast"))
