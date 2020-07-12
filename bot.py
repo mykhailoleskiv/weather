@@ -1,8 +1,10 @@
+import os
 from telebot import TeleBot, types
 from constants import TOKEN
 from weather import Weather
 
-bot = TeleBot(TOKEN)
+# bot = TeleBot(TOKEN)
+bot = TeleBot(os.environ['TOKEN'])
 weather = None
 
 
@@ -10,7 +12,11 @@ weather = None
 def get_weather(message):
     global weather
     weather = Weather(message.text.lower())
-    bot.send_message(message.chat.id, weather.pretty_output())
+    if weather.url:
+        bot.send_message(message.chat.id, weather.pretty_output())
+    else:
+        bot.send_message(message.chat.id, "Вказаної локації немає в списку")
+        return
     keyboard = types.InlineKeyboardMarkup()
     for date in weather.forecast.keys():
         keyboard.add(types.InlineKeyboardButton(text=date, callback_data=date))
@@ -31,7 +37,5 @@ def query_handler(call):
         for day in weather.forecast[call.data].keys():
             keyboard.add(types.InlineKeyboardButton(text=day, callback_data=call.data + " " + day))
         bot.send_message(call.message.chat.id, text="Оберіть період доби", reply_markup=keyboard)
-
-
 
 bot.polling()

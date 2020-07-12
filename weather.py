@@ -26,7 +26,6 @@ class Weather:
 
     def build_local_weather(self):
         if not self.url:
-            print("Вказаної локації немає в списку.")
             return
         req = requests.get(self.url, verify=False)
         soup = BeautifulSoup(req.text, "html.parser")
@@ -89,7 +88,7 @@ class Weather:
 
 
 if __name__ == "__main__":
-    # weather = Weather(input("Введіть локацію: "))
-    weather = Weather('львів')
+    weather = Weather(input("Введіть локацію: "))
+    # weather = Weather('львів')
     print(weather.pretty_output(weather_type="current"))
     print(weather.pretty_output(weather_type="forecast"))
