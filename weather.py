@@ -64,12 +64,15 @@ class Weather:
         for date in forecast["date"]:
             self.forecast[date] = {}
             for _ in range(2):
-                self.forecast[date][forecast["day"][i]] = {
-                    "Хмарн.": forecast["clouds"][i],
-                    "Темп.": forecast["temp"][i] + "°",
-                    "Вітер": forecast["wind"][i] + " м/с",
-                    "Напрям": forecast["direction"][i],
-                }
+                try:
+                    self.forecast[date][forecast["day"][i]] = {
+                        "Хмарн.": forecast["clouds"][i],
+                        "Темп.": forecast["temp"][i] + "°",
+                        "Вітер": forecast["wind"][i] + " м/с",
+                        "Напрям": forecast["direction"][i],
+                    }
+                except IndexError:
+                    continue
                 i += 1
 
     def pretty_output(self, weather_type="current"):
