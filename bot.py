@@ -10,14 +10,26 @@ weather = None
 server = Flask(__name__)
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(commands=["start", "help"])
+def send_welcome(message):
+    bot.send_message(
+        message.chat,
+        "Для отримання інформації відправте боту назву міста. Бот пришле поточну"
+        " погоду на вибір дати для отримання прогнозу",
+    )
+
+
+@bot.message_handler(content_types=["text"])
 def get_weather(message):
     global weather
     weather = Weather(message.text.lower())
     if weather.url:
         bot.send_message(message.chat.id, weather.pretty_output())
     else:
-        bot.send_message(message.chat.id, "Вказаної локації немає в списку")
+        bot.send_message(
+            message.chat.id,
+            "Вказаної локації немає в списку. Схожі: " + ", ".join(weather.similar),
+        )
         return
     keyboard = types.InlineKeyboardMarkup()
     for date in weather.forecast.keys():
@@ -29,21 +41,29 @@ def get_weather(message):
 def query_handler(call):
     global weather
     keyboard = types.InlineKeyboardMarkup()
-    if 'День' in call.data or 'Ніч' in call.data:
+    if "День" in call.data or "Ніч" in call.data:
         data = call.data.split()
-        answer = ''
+        answer = ""
         for key, value in weather.forecast[data[0]][data[1]].items():
             answer += f"{key} - {value}\n"
         bot.send_message(call.message.chat.id, text=answer)
     else:
         for day in weather.forecast[call.data].keys():
-            keyboard.add(types.InlineKeyboardButton(text=day, callback_data=call.data + " " + day))
-        bot.send_message(call.message.chat.id, text="Оберіть період доби", reply_markup=keyboard)
+            keyboard.add(
+                types.InlineKeyboardButton(
+                    text=day, callback_data=call.data + " " + day
+                )
+            )
+        bot.send_message(
+            call.message.chat.id, text="Оберіть період доби", reply_markup=keyboard
+        )
 
 
 @server.route("/" + TOKEN, methods=["POST"])
 def get_message():
-    bot.process_new_updates([types.Update.de_json(request.stream.read().decode("utf-8"))])
+    bot.process_new_updates(
+        [types.Update.de_json(request.stream.read().decode("utf-8"))]
+    )
     return "!", 200
 
 
@@ -55,6 +75,6 @@ def webhook():
 
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 # bot.polling()

@@ -11,7 +11,8 @@ disable_warnings(InsecureRequestWarning)
 
 class Weather:
     def __init__(self, name, url=URL):
-        self.url = self.get_location_link(name, url)
+        self.similar = []
+        self.url = self.get_location_link(name.lower(), url)
         self.current = {}
         self.forecast = {}
         self.build_local_weather()
@@ -20,8 +21,13 @@ class Weather:
     def get_location_link(self, name, url):
         req = requests.get(url, verify=False)
         soup = BeautifulSoup(req.text, "html.parser")
+        name_short = name[:2]
         for item in soup.findAll("a", {"class": "m13"}):
-            if item.text.lower() == name.lower():
+            text = item.text.lower()
+            print(text)
+            if text[:2] == name_short:
+                self.similar.append(item.text)
+            if text == name:
                 return item.attrs["href"]
 
     def build_local_weather(self):
@@ -76,7 +82,9 @@ class Weather:
                 i += 1
 
     def pretty_output(self, weather_type="current"):
-        res = ''
+        res = ""
+        if not self.url:
+            return ", ".join(self.similar)
         if weather_type == "current":
             for key, value in self.current.items():
                 res += f"{key} - {value}\n"
@@ -94,4 +102,4 @@ if __name__ == "__main__":
     weather = Weather(input("Введіть локацію: "))
     # weather = Weather('львів')
     print(weather.pretty_output(weather_type="current"))
-    print(weather.pretty_output(weather_type="forecast"))
+    # print(weather.pretty_output(weather_type="forecast"))
