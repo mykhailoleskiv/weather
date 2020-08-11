@@ -81,7 +81,7 @@ def query_handler(call):
 
 
 @post("/" + TOKEN)
-def get_message(TOKEN_SLICE):
+def get_message(*args):
     bot.process_new_updates([types.Update.de_json(request.body.read().decode("utf-8"))])
     return "!", 200
 
