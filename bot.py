@@ -1,15 +1,14 @@
 import os
 
 from telebot import TeleBot, types
-from constants import TOKEN, APP_NAME, TOKEN_SLICE
+from constants import TOKEN, APP_NAME
 from weather import Weather
 
-# from flask import Flask , request
-from bottle import route, run, post, request
+from flask import Flask , request
 
 bot = TeleBot(TOKEN)
 weather = None
-# server = Flask(__name__)
+server = Flask(__name__)
 
 
 @bot.message_handler(commands=["start", "help"])
@@ -61,32 +60,15 @@ def query_handler(call):
         )
 
 
-# @server.route("/" + TOKEN, methods=["POST"])
-# def get_message():
-#     bot.process_new_updates(
-#         [types.Update.de_json(request.stream.read().decode("utf-8"))]
-#     )
-#     return "!", 200
-#
-#
-# @server.route("/")
-# def webhook():
-#     bot.remove_webhook()
-#     bot.set_webhook(url="https://" + APP_NAME + ".herokuapp.com/" + TOKEN)
-#     return "!", 200
-#
-#
-# if __name__ == "__main__":
-#     server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-
-@post("/" + TOKEN)
-def get_message(*args, **kwargs):
-    bot.process_new_updates([types.Update.de_json(request.body.read().decode("utf-8"))])
+@server.route("/" + TOKEN, methods=["POST"])
+def get_message():
+    bot.process_new_updates(
+        [types.Update.de_json(request.stream.read().decode("utf-8"))]
+    )
     return "!", 200
 
 
-@route("/")
+@server.route("/")
 def webhook():
     bot.remove_webhook()
     bot.set_webhook(url="https://" + APP_NAME + ".herokuapp.com/" + TOKEN)
@@ -94,6 +76,6 @@ def webhook():
 
 
 if __name__ == "__main__":
-    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    server.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 # bot.polling()
