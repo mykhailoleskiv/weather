@@ -1,8 +1,9 @@
 import os
 
 from telebot import TeleBot, types
-from constants import TOKEN, APP_NAME
+from constants import TOKEN, APP_NAME, TOKEN_SLICE
 from weather import Weather
+
 # from flask import Flask , request
 from bottle import route, run, post, request
 
@@ -80,10 +81,8 @@ def query_handler(call):
 
 
 @post("/" + TOKEN)
-def get_message():
-    bot.process_new_updates(
-        [types.Update.de_json(request.body.read().decode("utf-8"))]
-    )
+def get_message(TOKEN_SLICE):
+    bot.process_new_updates([types.Update.de_json(request.body.read().decode("utf-8"))])
     return "!", 200
 
 
