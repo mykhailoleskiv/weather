@@ -13,9 +13,9 @@ server = Flask(__name__)
 @bot.message_handler(commands=["start", "help"])
 def send_welcome(message):
     bot.send_message(
-        message.chat,
+        message.chat.id,
         "Для отримання інформації відправте боту назву міста. Бот пришле поточну"
-        " погоду на вибір дати для отримання прогнозу",
+        " погоду та на вибір дати для отримання прогнозу",
     )
 
 
