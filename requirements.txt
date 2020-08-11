@@ -1,5 +1,5 @@
 beautifulsoup4==4.4.1
-bottle==0.12.18
+flask==1.1.2
 requests==2.23.0
 pyTelegramBotAPI==3.7.2
 python-decouple==3.3

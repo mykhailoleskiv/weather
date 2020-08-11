@@ -1,9 +1,11 @@
 from telebot import TeleBot, types
-from constants import TOKEN
+from constants import TOKEN, APP_NAME
 from weather import Weather
+from flask import Flask, request
 
 bot = TeleBot(TOKEN)
 weather = None
+server = Flask(__name__)
 
 
 @bot.message_handler(content_types=['text'])
@@ -36,4 +38,21 @@ def query_handler(call):
             keyboard.add(types.InlineKeyboardButton(text=day, callback_data=call.data + " " + day))
         bot.send_message(call.message.chat.id, text="Оберіть період доби", reply_markup=keyboard)
 
-bot.polling()
+
+@server.route("/" + TOKEN, methods=["POST"])
+def get_message():
+    bot.process_new_updates([types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
+
+
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url="https://" + APP_NAME + ".herokuapp.com/" + TOKEN)
+    return "!", 200
+
+
+if __name__ == "__main__":
+    server.run(host="0.0.0.0", port=5000)
+
+# bot.polling()
