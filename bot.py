@@ -1,10 +1,8 @@
-import os
 from telebot import TeleBot, types
 from constants import TOKEN
 from weather import Weather
 
-# bot = TeleBot(TOKEN)
-bot = TeleBot(os.environ['TOKEN'])
+bot = TeleBot(TOKEN)
 weather = None
 
 
