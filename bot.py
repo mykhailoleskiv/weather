@@ -1,3 +1,5 @@
+import os
+
 from telebot import TeleBot, types
 from constants import TOKEN, APP_NAME
 from weather import Weather
@@ -53,6 +55,6 @@ def webhook():
 
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=5000)
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
 
 # bot.polling()
