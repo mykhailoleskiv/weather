@@ -1,10 +1,10 @@
 import os
 
+from flask import Flask, request
 from telebot import TeleBot, types
+
 from constants import TOKEN, APP_NAME
 from weather import Weather
-
-from flask import Flask , request
 
 bot = TeleBot(TOKEN)
 weather = None

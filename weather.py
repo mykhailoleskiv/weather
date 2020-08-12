@@ -1,3 +1,4 @@
+from difflib import SequenceMatcher
 from functools import lru_cache
 
 import requests
@@ -24,8 +25,10 @@ class Weather:
         name_short = name[:2]
         for item in soup.findAll("a", {"class": "m13"}):
             text = item.text.lower()
-            print(text)
-            if text[:2] == name_short:
+            if (
+                text[:2] == name_short
+                or SequenceMatcher(a=text, b=name_short).ratio() > 0.5
+            ):
                 self.similar.append(item.text)
             if text == name:
                 return item.attrs["href"]
