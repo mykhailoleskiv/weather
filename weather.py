@@ -25,10 +25,7 @@ class Weather:
         name_short = name[:2]
         for item in soup.findAll("a", {"class": "m13"}):
             text = item.text.lower()
-            if (
-                text[:2] == name_short
-                or SequenceMatcher(a=text, b=name_short).ratio() > 0.5
-            ):
+            if text[:2] == name_short or SequenceMatcher(a=text, b=name).ratio() > 0.5:
                 self.similar.append(item.text)
             if text == name:
                 return item.attrs["href"]

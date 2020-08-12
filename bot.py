@@ -24,15 +24,20 @@ def send_welcome(message):
 def get_weather(message):
     global weather
     weather = Weather(message.text.lower())
+    keyboard = types.InlineKeyboardMarkup()
     if weather.url:
         bot.send_message(message.chat.id, weather.pretty_output())
     else:
+        for location in weather.similar:
+            keyboard.add(
+                types.InlineKeyboardButton(text=location, callback_data=location)
+            )
         bot.send_message(
             message.chat.id,
-            "Вказаної локації немає в списку. Схожі: " + ", ".join(weather.similar),
+            "Вказаної локації немає в списку. Можливо ви мали на увазі:",
+            reply_markup=keyboard,
         )
         return
-    keyboard = types.InlineKeyboardMarkup()
     for date in weather.forecast.keys():
         keyboard.add(types.InlineKeyboardButton(text=date, callback_data=date))
     bot.send_message(message.chat.id, text="Оберіть дату", reply_markup=keyboard)
@@ -42,18 +47,20 @@ def get_weather(message):
 def query_handler(call):
     global weather
     keyboard = types.InlineKeyboardMarkup()
-    if "День" in call.data or "Ніч" in call.data:
-        data = call.data.split()
+    s = call.data
+    if "День" in s or "Ніч" in s:
+        data = s.split()
         answer = ""
         for key, value in weather.forecast[data[0]][data[1]].items():
             answer += f"{key} - {value}\n"
         bot.send_message(call.message.chat.id, text=answer)
+    elif not any(char.isdigit() for char in s):
+        call.message.text = s
+        get_weather(call.message)
     else:
-        for day in weather.forecast[call.data].keys():
+        for day in weather.forecast[s].keys():
             keyboard.add(
-                types.InlineKeyboardButton(
-                    text=day, callback_data=call.data + " " + day
-                )
+                types.InlineKeyboardButton(text=day, callback_data=s + " " + day)
             )
         bot.send_message(
             call.message.chat.id, text="Оберіть період доби", reply_markup=keyboard
