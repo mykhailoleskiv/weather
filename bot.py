@@ -9,15 +9,21 @@ from weather import Weather
 bot = TeleBot(TOKEN)
 weather = None
 server = Flask(__name__)
+help_message = "Для отримання інформації відправте боту назву міста. Бот " \
+               "пришле поточну погоду та на вибір дати для отримання прогнозу"
 
 
-@bot.message_handler(commands=["start", "help"])
+@bot.message_handler(commands=["start"])
 def send_welcome(message):
     bot.send_message(
         message.chat.id,
-        "Для отримання інформації відправте боту назву міста. Бот пришле поточну"
-        " погоду та на вибір дати для отримання прогнозу",
+        "Вас вітає неофіціний погодний бот УкрГідроМетЦентру. " + help_message,
     )
+
+
+@bot.message_handler(commands=["help"])
+def send_welcome(message):
+    bot.send_message(message.chat.id, help_message)
 
 
 @bot.message_handler(content_types=["text"])
@@ -30,7 +36,8 @@ def get_weather(message):
     else:
         for location in weather.similar:
             keyboard.add(
-                types.InlineKeyboardButton(text=location, callback_data=location)
+                types.InlineKeyboardButton(text=location,
+                                           callback_data=location)
             )
         bot.send_message(
             message.chat.id,
@@ -40,7 +47,8 @@ def get_weather(message):
         return
     for date in weather.forecast.keys():
         keyboard.add(types.InlineKeyboardButton(text=date, callback_data=date))
-    bot.send_message(message.chat.id, text="Оберіть дату", reply_markup=keyboard)
+    bot.send_message(message.chat.id, text="Оберіть дату",
+                     reply_markup=keyboard)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -60,10 +68,12 @@ def query_handler(call):
     else:
         for day in weather.forecast[s].keys():
             keyboard.add(
-                types.InlineKeyboardButton(text=day, callback_data=s + " " + day)
+                types.InlineKeyboardButton(text=day,
+                                           callback_data=s + " " + day)
             )
         bot.send_message(
-            call.message.chat.id, text="Оберіть період доби", reply_markup=keyboard
+            call.message.chat.id, text="Оберіть період доби",
+            reply_markup=keyboard
         )
 
 
